@@ -6,6 +6,8 @@ public class Player : MonoBehaviour
 {
     [SerializeField]
     private float _playerSpeed;
+    [SerializeField] 
+    private float _playerRotationSpeed;
     [SerializeField]
     private float _jumpHeight;
     [SerializeField]
@@ -13,14 +15,10 @@ public class Player : MonoBehaviour
 
     private Vector3 _playerVelocity;
     public bool _isGrounded = true;
-    private Vector3 _velocity;
+
 
     private CharacterController _characterController;
 
-    // input system horz, vert
-    // controller.move(WASAD * speed * time.deltatime)
-
-    // Jump
     void Start()
     {
         _characterController = GetComponent<CharacterController>();
@@ -32,38 +30,38 @@ public class Player : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetButtonDown("Jump"))
+        // Update _isGrounded
+        _isGrounded = _characterController.isGrounded;
+
+        if (Input.GetKeyDown(KeyCode.Space)) 
         {
             Jump();
         }
 
-        MovePlayer();
+        Move();
     }
 
-    private void Jump()
-    {
-        if(_isGrounded)
-        {
-            _playerVelocity.y += Mathf.Sqrt(_jumpHeight * -3.0f * _gravityValue);
-        }
-    }
-
-    private void MovePlayer()
+    private void Move()
     {
         // Acts as gravity
         _playerVelocity.y += _gravityValue * Time.deltaTime;
-        _characterController.Move(_playerVelocity * Time.deltaTime);
+        _characterController.Move(_playerVelocity * Time.deltaTime);        
 
-        // Update _isGrounded
-        _isGrounded = _characterController.isGrounded;
+        // Rotate Character
+        this.transform.Rotate(0, Input.GetAxis("Horizontal") * _playerRotationSpeed, 0);
 
-        // Player cannot change direction while airborne but will have intertia
+        // Move player
+        Vector3 forward = transform.TransformDirection(Vector3.forward);
+        float curSpeed = _playerSpeed * Input.GetAxis("Vertical");
+        _characterController.SimpleMove(forward * curSpeed);
+    }
+    private void Jump()
+    {
+
         if (_isGrounded)
         {
-            _velocity = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+            _playerVelocity.y += Mathf.Sqrt(_jumpHeight * -3.0f * _gravityValue);
+            _characterController.Move(_playerVelocity * Time.deltaTime);
         }
-
-        _characterController.Move(_velocity * _playerSpeed * Time.deltaTime);
     }
-
 }
