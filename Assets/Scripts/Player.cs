@@ -14,7 +14,9 @@ public class Player : MonoBehaviour
     private float _gravityValue;
 
     private Vector3 _playerVelocity;
-    public bool _isGrounded = true;
+    private bool _isGrounded = true;
+
+    private float _mouseX;
 
 
     private CharacterController _characterController;
@@ -43,12 +45,12 @@ public class Player : MonoBehaviour
 
     private void Move()
     {
+        _mouseX = Input.GetAxis("Mouse X");
         // Acts as gravity
         _playerVelocity.y += _gravityValue * Time.deltaTime;
         _characterController.Move(_playerVelocity * Time.deltaTime);        
 
-        // Rotate Character
-        this.transform.Rotate(0, Input.GetAxis("Horizontal") * _playerRotationSpeed, 0);
+        this.transform.Rotate(0, _mouseX * _playerRotationSpeed, 0);
 
         // Move player
         Vector3 forward = transform.TransformDirection(Vector3.forward);
