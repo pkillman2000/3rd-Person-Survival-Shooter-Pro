@@ -8,6 +8,9 @@ public class CameraController : MonoBehaviour
     private float _minPitch;
     [SerializeField] 
     private float _maxPitch;
+    [SerializeField]
+    private float _cameraSpeed;
+
 
     [SerializeField]
     private Player _player;
@@ -24,7 +27,7 @@ public class CameraController : MonoBehaviour
     private void AdjustCameraPitch()
     {
         // Pitch
-        _mouseY = Input.GetAxis("Mouse Y");
+        _mouseY = Input.GetAxis("Mouse Y") * _cameraSpeed;
         _currentPitch = Mathf.Clamp(_currentPitch - _mouseY, _minPitch, _maxPitch);
 
         // Rotate Camera
