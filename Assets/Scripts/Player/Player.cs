@@ -29,49 +29,45 @@ public class Player : MonoBehaviour
 
     void Update()
     {
-        // Move player down if applicable
+        // Apply gravity before any movement
         Gravity();
         _isGrounded = _characterController.isGrounded;
 
-        // Jump
-        if (Input.GetKeyDown(KeyCode.Space)) 
-        {
-            Jump();
-        }
-
-        // Move player
+        Jump();
         Move();
     }
 
+    // Player does not need to be grounded to move
+    // It can change directon and movement in mid-air
     private void Move()
     {
-        float strafe = Input.GetAxis("Horizontal");
-        float curSpeed = Input.GetAxis("Vertical");
-        Vector3 _direction = new Vector3(strafe, 0, curSpeed);
-        Vector3 velocity = _direction * _playerSpeed;
-        _mouseX = Input.GetAxis("Mouse X");
+            // Move player with keyboard - forwards/backwards and left/right
+            float strafe = Input.GetAxis("Horizontal"); // Left/Right keys
+            float curSpeed = Input.GetAxis("Vertical"); // Up/Down keys
+            Vector3 _direction = new Vector3(strafe, 0, curSpeed);
+            Vector3 velocity = _direction * _playerSpeed;
 
-        // Rotate player
-        this.transform.Rotate(0, _mouseX * _playerRotationSpeed, 0);
+            /* Rotate player
+             * Convert local space to world space - TransformDirection
+             * Player moves in the direction it is facing
+            */
+            _mouseX = Input.GetAxis("Mouse X");
+            this.transform.Rotate(0, _mouseX * _playerRotationSpeed, 0);
+            velocity = transform.TransformDirection(velocity);
 
-        // Convert local space to world space
-        // It moves the direction the player is facing on not 
-        // world space Z
-        velocity = transform.TransformDirection(velocity);
-        // Move Player
-        _characterController.Move(velocity * Time.deltaTime);
+            // Move Player
+            _characterController.Move(velocity * Time.deltaTime);
     }
 
     private void Jump()
     {
-        if (_isGrounded)
+        if (_isGrounded && Input.GetKeyDown(KeyCode.Space))
         {
             _playerGravity.y += Mathf.Sqrt(_jumpHeight * -3.0f * _gravityValue);
             _characterController.Move(_playerGravity * Time.deltaTime);
         }
     }
 
-    // Acts as gravity
     private void Gravity()
     {
         _playerGravity.y += _gravityValue * Time.deltaTime;
